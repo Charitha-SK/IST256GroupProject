@@ -73,18 +73,31 @@ footer p {
 /* END SIGN UP SHEET */
 
 /* HOMEPAGE */
+body h1 {
+    font-size:56px;
+    font-weight: bold;
+    padding-top: 40px;
+}
+body > p {
+    font-size: 20px;
+    text-align: center;
+}
 .home-navbar {
     background-color: #1d5563;
+    border-top: 4px solid #c9962b;
     border-bottom: 4px solid #c9962b:
+    padding: 10px;
+    margin-top: 20px;
 }
-.home-navbar .navbar-brand {
+.home-navbar li {
     color: white:
     font-weight: bold;
-    font-size: 24px;
+    padding: 8px 15px;
 }
-.home-navbar .nav-link {
+.home-navbar a {
     color: white:
-    font-weight: bold;
 }
-.ho
+.home-navbar a:hover {
+    color: lightblue;
+}
 /* ENG HOMEPAGE */
