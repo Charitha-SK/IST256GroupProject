@@ -103,6 +103,7 @@ body > p {
 }
 .home-navbar a {
     color: white;
+    margin: 0;
 }
 .home-navbar a:hover {
     color: lightblue;
