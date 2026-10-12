@@ -76,6 +76,7 @@ footer p {
 body h1 {
     font-size:56px;
     font-weight: bold;
+    text-align: center;
     padding-top: 40px;
 }
 body > p {
@@ -85,17 +86,17 @@ body > p {
 .home-navbar {
     background-color: #1d5563;
     border-top: 4px solid #c9962b;
-    border-bottom: 4px solid #c9962b:
+    border-bottom: 4px solid #c9962b;
     padding: 10px;
     margin-top: 20px;
 }
 .home-navbar li {
-    color: white:
+    color: white;
     font-weight: bold;
     padding: 8px 15px;
 }
 .home-navbar a {
-    color: white:
+    color: white;
 }
 .home-navbar a:hover {
     color: lightblue;
