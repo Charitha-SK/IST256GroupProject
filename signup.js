@@ -17,16 +17,16 @@ form.addEventListener("submit", function (e) {
   // ---------- Validation ----------
   const errors = [];
 
-  if (name.length < 2 || !/^[A-Za-z][A-Za-z\s'.-]*$/.test(name)) {
+  if (name.value.length < 2 || !/^[A-Za-z][A-Za-z\s'.-]*$/.test(name)) {
     errors.push("Name is required (letters only, at least 2 characters).");
   }
-  if (!/^\d+$/.test(age) || Number(age) < 13 || Number(age) > 120) {
+  if (!/^\d+$/.test(age) || parseInt(age) < 13 || parseInt(age) > 120) {
     errors.push("Age must be a number between 13 and 120.");
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     errors.push("Enter a valid email address (example: name@email.com).");
   }
-  if (address.length < 5) {
+  if (address.value.length < 5) {
     errors.push("Address is required (at least 5 characters).");
   }
 
