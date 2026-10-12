@@ -26,17 +26,19 @@ nav a:hover {
     color: lightblue;
 }
 
-.signup-box {
+#jsonBox {
     background-color: white;
-    padding: 35px;
-    border-radius: 12px;
-    max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border: 1px solid #ccc;
 }
 
-.signup-box h2 {
-    color: #f5efd6;
+#message {
+    margin-top: 12px;
     font-weight: bold;
+}
+
+#memberList {
+    overflow-x: auto;
 }
 
 form label {
@@ -49,18 +51,13 @@ form label {
 }
 
 .btn-primary {
-    background-color: #f5efd6;
+    background-color: #1d5563;
     border: none;
-    padding: 12px;
-}
-
-.btn-primary:hover {
-    background-color: #f5efd6;
 }
 
 footer {
     background-color: #f5efd6;
-    color: white;
+    color: #333;
     text-align: center;
     padding: 15px;
     margin-top: 40px;
