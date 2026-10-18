@@ -107,3 +107,14 @@ body > p {
     text-decoration: underline;
 }
 /* END HOMEPAGE */
+
+/* CATALOG */
+header {
+    text-align: center;
+}
+header h1 {
+    font-size: 56px;
+    font-weight: bold;
+    color: #1d5563;
+}
+/* END CATALOG */
