@@ -1,0 +1,26 @@
+{
+  "comment": "This file is the Daily Digest product list. Load products.json on the product page. Use the products array. Each item has productId, description, category, unitOfMeasure, and price. Search and update using these fields. Do not rename this file or these field names.",
+  "products": [
+    {
+      "productId": "DD-001",
+      "description": "Campus Tech Fair Recap",
+      "category": "News",
+      "unitOfMeasure": "Article",
+      "price": 1.99
+    },
+    {
+      "productId": "DD-002",
+      "description": "Quiet Hours Photo Essay",
+      "category": "Stories",
+      "unitOfMeasure": "Photo Essay",
+      "price": 2.49
+    },
+    {
+      "productId": "DD-003",
+      "description": "Five-Minute Reset",
+      "category": "Inspiration",
+      "unitOfMeasure": "Article",
+      "price": 0.99
+    }
+  ]
+}
