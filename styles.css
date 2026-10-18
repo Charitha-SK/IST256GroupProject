@@ -124,6 +124,18 @@ nav {
     border-bottom: 4px solid #c9962b;
     padding: 10px;
 }
+#saveButton {
+    background-color: #1d5563;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}
+#clearButton {
+    background-color: #1d5563;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}
 
 
 /* END CATALOG */
