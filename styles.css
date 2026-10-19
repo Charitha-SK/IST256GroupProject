@@ -172,7 +172,6 @@ nav {
 #productForm input {
     display: block;
     width: 100%;
-    margin-bottom: 15px;
     padding: 6px;
 }
 #productForm select {
@@ -180,9 +179,6 @@ nav {
     width: 100%;
     margin-bottom: 15px;
     padding: 6px;
-}
-#productForm br {
-    display: none;
 }
 .table {
     margin-bottom: 25px;
