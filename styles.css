@@ -111,17 +111,23 @@ body > p {
 /* CATALOG */
 header {
     text-align: center;
+    padding-top: 40px;
+    padding-bottom: 0;
 }
 header h1 {
     font-size: 56px;
     font-weight: bold;
+}
+header p {
+    font-size: 20px;
 }
 nav {
     text-align: center;
     background-color: #1d5563;
     border-top: 4px solid #c9962b;
     border-bottom: 4px solid #c9962b;
-    padding: 10px;
+    padding: 18px 10px;
+    margin-top: 20px;
 }
 #saveButton {
     background-color: #1d5563;
@@ -139,7 +145,7 @@ nav {
     width: 100%;
     max-width: 400px;
     padding: 10px;
-    border: 1px solid color;
+    border: 1px solid #ccc;
     border-radius: 6px;
 }
 #searchMessage {
