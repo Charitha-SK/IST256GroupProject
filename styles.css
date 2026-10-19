@@ -115,7 +115,6 @@ header {
 header h1 {
     font-size: 56px;
     font-weight: bold;
-    color: #1d5563;
 }
 nav {
     text-align: center;
@@ -157,6 +156,11 @@ nav {
     border-radius: 6px;
     padding: 25px;
     max-width: 500px;
+}
+#productForm label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
 }
 /* END CATALOG */
 
