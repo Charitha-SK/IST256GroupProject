@@ -137,6 +137,7 @@ nav {
 }
 #searchInput {
     width: 100%;
+    max-width: 400px;
     padding: 10px;
     border: 1px solid color;
     border-radius: 6px;
@@ -151,7 +152,7 @@ nav {
 }
 #productForm {
     background-color: white;
-    border: 1px solid;
+    border: 1px solid #ddd3ad;
     border-top: 5px solid #1d5563;
     border-radius: 6px;
     padding: 25px;
@@ -161,6 +162,24 @@ nav {
     display: block;
     font-weight: bold;
     margin-bottom: 4px;
+}
+#productForm input {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 6px;
+}
+#productForm select {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 6px;
+}
+#productForm br {
+    display: none;
+}
+.table {
+    margin-bottom: 25px;
 }
 /* END CATALOG */
 
