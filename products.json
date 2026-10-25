@@ -1,26 +1,15 @@
 {
   "comment": "This file is the Daily Digest product list. Load products.json on the product page. Use the products array. Each item has productId, description, category, unitOfMeasure, and price. Search and update using these fields. Do not rename this file or these field names.",
   "products": [
-    {
-      "productId": "DD-001",
-      "description": "Campus Tech Fair Recap",
-      "category": "News",
-      "unitOfMeasure": "Article",
-      "price": 1.99
-    },
-    {
-      "productId": "DD-002",
-      "description": "Quiet Hours Photo Essay",
-      "category": "Stories",
-      "unitOfMeasure": "Photo Essay",
-      "price": 2.49
-    },
-    {
-      "productId": "DD-003",
-      "description": "Five-Minute Reset",
-      "category": "Inspiration",
-      "unitOfMeasure": "Article",
-      "price": 0.99
-    }
+    { "productId": "DD-001", "description": "Campus Tech Fair Recap", "category": "Technology", "unitOfMeasure": "Digital", "price": 1.99 },
+    { "productId": "DD-002", "description": "Quiet Hours Photo Essay", "category": "Lifestyle", "unitOfMeasure": "Digital", "price": 2.49 },
+    { "productId": "DD-003", "description": "Five-Minute Reset", "category": "Lifestyle", "unitOfMeasure": "Digital", "price": 0.99 },
+    { "productId": "DD-004", "description": "Student Budget Meal Guide", "category": "Lifestyle", "unitOfMeasure": "Digital", "price": 1.49 },
+    { "productId": "DD-005", "description": "Best Reads of the Semester", "category": "Books", "unitOfMeasure": "Digital", "price": 1.79 },
+    { "productId": "DD-006", "description": "Daily Digest Reading List Set", "category": "Books", "unitOfMeasure": "Set", "price": 12.99 },
+    { "productId": "DD-007", "description": "Daily Digest Tote Bag", "category": "Accessories", "unitOfMeasure": "Each", "price": 14.99 },
+    { "productId": "DD-008", "description": "Dorm Room Refresh Guide", "category": "Home", "unitOfMeasure": "Digital", "price": 2.29 },
+    { "productId": "DD-009", "description": "Daily Digest Monthly Pass", "category": "Lifestyle", "unitOfMeasure": "Subscription", "price": 7.99 },
+    { "productId": "DD-010", "description": "Study Gadgets Roundup", "category": "Technology", "unitOfMeasure": "Digital", "price": 1.99 }
   ]
 }
