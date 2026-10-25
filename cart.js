@@ -340,6 +340,39 @@ document.addEventListener("DOMContentLoaded", function () {
         addToCart: addToCart
     };
 
+    //search
+    $("#searchInput").on("input", function () {
+        const search = $(this).val().trim().toLowerCase();
+
+        let matches = 0;
+
+        $productTableBody.find("tr").each(function () {
+
+            // Search the product information
+            const rowText = $(this)
+                .children("td")
+                .slice(0, 5)
+                .text()
+                .toLowerCase();
+
+            const isMatch = rowText.includes(search);
+
+            // jQuery shows or hides matching rows
+            $(this).toggle(isMatch);
+
+            if (isMatch) {
+                matches++;
+            }
+        });
+
+        // Display message when no matches are found
+        $("#searchMessage").text(
+            search !== "" && matches === 0
+                ? "No matching products found."
+                : ""
+        );
+    });
+
     // Display products and cart when page opens
     showProducts();
     showCart();
