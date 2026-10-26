@@ -224,4 +224,7 @@ main {
     padding: 10px;
     border: 1px solid #ccc;
 }
+#cartTableBody Input {
+    max-width: 90px;
+}
 /* END CART */
