@@ -188,3 +188,40 @@ main {
 }
 /* END CATALOG */
 
+/* CART */
+#productResults div {
+    background-color: white;
+}
+#productResults p {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+#cartTotal {
+    color: #1d5563;
+    font-weight: bold;
+}
+#sendCartButton {
+    background-color: #1d5563;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}
+#cartMessage {
+    margin-top: 12px;
+    font-weight: bold;
+}
+#apiMessage {
+    margin-top: 12px;
+    font-weight: bold;
+}
+#cartJsonPreview {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+#apiResponsePreview {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+/* END CART */
