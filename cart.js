@@ -342,6 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //search
     $("#searchInput").on("input", function () {
+        let results = document.getElementById("productResults");
         const search = $(this).val().trim().toLowerCase();
 
         let matches = 0;
@@ -349,9 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
         results.find("tr").each(function () {
 
             // Search the product information
-            const rowText = $(this)
-                .children("td")
-                .slice(0, 5)
+            const itemText = $(this)
                 .text()
                 .toLowerCase();
 
