@@ -88,6 +88,8 @@ $(function () {
         .always(function () {
             $button.prop("disabled", false);
         });
+
+        document.dispatchEvent(new CustomEvent("cartReady", { detail: cartData }));
     }
 
     // cart.js fires "cartReady" (with the cart JSON) when the button is clicked

@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let cart = [];
     let editingId = "";
+    let currentSearch = "";
 
     // Load saved data
     let savedProducts = localStorage.getItem("dailyDigestProducts");
@@ -38,23 +39,39 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("dailyDigestCart", JSON.stringify(cart));
     }
 
+    function matchesSearch(p, terms) {
+        let text = (p.productId + " " + p.description + " " +
+                    p.category + " " + p.unitOfMeasure).toLowerCase();
+ 
+        for (let i = 0; i < terms.length; i++) {
+            if (!text.includes(terms[i])) {
+                return false;
+            }
+        }
+ 
+        return true;
+    }
+
     // Display available products
     function showProducts(search) {
         let results = document.getElementById("productResults");
         results.innerHTML = "";
 
-        if (!search) {
-            search = "";
+        if (search === undefined || search === null) {
+            search = currentSearch;
+        } else {
+            currentSearch = search;
         }
+ 
+        let cleaned = search.trim().toLowerCase();
+        let terms = cleaned === "" ? [] : cleaned.split(/\s+/);
 
         let matches = 0;
 
         for (let i = 0; i < products.length; i++) {
             let p = products[i];
 
-            let text = (p.productId + p.description + p.category).toLowerCase();
-
-            if (text.includes(search.toLowerCase())) {
+            if (matchesSearch(p, terms)) {
                 matches++;
 
                 let div = document.createElement("div");
@@ -342,35 +359,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //search
     $("#searchInput").on("input", function () {
-        const search = $(this).val().trim().toLowerCase();
-
-        let matches = 0;
-
-        $productTableBody.find("tr").each(function () {
-
-            // Search the product information
-            const rowText = $(this)
-                .children("td")
-                .slice(0, 5)
-                .text()
-                .toLowerCase();
-
-            const isMatch = rowText.includes(search);
-
-            // jQuery shows or hides matching rows
-            $(this).toggle(isMatch);
-
-            if (isMatch) {
-                matches++;
-            }
-        });
-
-        // Display message when no matches are found
-        $("#searchMessage").text(
-            search !== "" && matches === 0
-                ? "No matching products found."
-                : ""
-        );
+        showProducts($(this).val());
+    });
+ 
+    // Pressing Enter in the search box should search, not submit a form
+    $("#searchInput").on("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            showProducts($(this).val());
+        }
+    });
+    
     });
 
     // Display products and cart when page opens
