@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let matches = 0;
 
-        $productTableBody.find("tr").each(function () {
+        results.find("tr").each(function () {
 
             // Search the product information
             const rowText = $(this)
