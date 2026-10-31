@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Daily Digest Publication Options</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Our CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Website heading -->
+    <header>
+        <h1>Daily Digest</h1>
+        <p>Your Magazine. Your Interests. Your Content.</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="signup.html">Subscribe</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="cart.html">Shopping Cart</a>
+        <a href="publication.html">Publication Options</a>
+    </nav>
+
+    <!-- Main page content -->
+    <main class="container">
+
+        <h2>Publication Options</h2>
+        <p>Choose how and when your Daily Digest content will be published.</p>
+
+        <!-- Publication form -->
+        <form id="publicationForm">
+
+            <!-- Article information -->
+            <h3>Article Information</h3>
+
+            <label for="articleTitle">Article Title:</label>
+            <input type="text" id="articleTitle" name="articleTitle" class="form-control" required>
+
+            <br>
+
+            <label for="articleDescription">Article Description:</label>
+            <textarea id="articleDescription" name="articleDescription" class="form-control" rows="3" required></textarea>
+
+            <br>
+
+            <!-- Publication date -->
+            <h3>Publication Details</h3>
+
+            <label for="publicationDate">Publication Date:</label>
+            <input type="date" id="publicationDate" name="publicationDate" class="form-control" required>
+
+            <br>
+
+            <!-- Distribution channels -->
+            <label>Distribution Channels:</label>
+
+            <div>
+                <input type="checkbox" id="website" name="channels" value="Website">
+                <label for="website">Website</label>
+            </div>
+
+            <div>
+                <input type="checkbox" id="email" name="channels" value="Email">
+                <label for="email">Email Newsletter</label>
+            </div>
+
+            <div>
+                <input type="checkbox" id="socialMedia" name="channels" value="Social Media">
+                <label for="socialMedia">Social Media</label>
+            </div>
+
+            <br>
+
+            <!-- Review status -->
+            <label for="reviewStatus">Review Status:</label>
+
+            <select id="reviewStatus" name="reviewStatus" class="form-select" required>
+                <option value="">Choose a status</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+
+            <br>
+
+            <!-- Additional notes -->
+            <label for="editorialNotes">Additional Notes:</label>
+
+            <textarea id="editorialNotes" name="editorialNotes" class="form-control" rows="4" placeholder="Enter any additional comments..."></textarea>
+
+            <br>
+
+            <!-- Form buttons -->
+            <button type="submit" id="submitPublication">Submit Publication Options</button>
+
+            <button type="reset" id="clearPublication">Clear Form</button>
+
+        </form>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Daily Digest</p>
+    </footer>
+
+</body>
+</html>
