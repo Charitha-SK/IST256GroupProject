@@ -228,3 +228,50 @@ main {
     max-width: 90px;
 }
 /* END CART */
+
+/* PUBLICATION */
+#publicationForm {
+    background-color: white;
+    border: 1px solid #ddd3ad;
+    border-top: 5px solid #1d5563;
+    border-radius: 6px;
+    padding: 25px;
+    max-width: 500px;
+}
+#publicationForm label {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+#clearPublication {
+    background-color: #1d5563;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}
+#submitPublication {
+    background-color: #1d5563;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}
+#publicationMessage {
+    max-width: 500px;
+    margin-top: 12px;
+    font-weight: bold;
+}
+#publicationApiMessage {
+    margin-top: 12px;
+    font-weight: bold;
+}
+#publicationApiResponse {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+#publicationJsonOutput {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+/* END PUBLICATION */
