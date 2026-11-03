@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Digest Billing Details</title>
+
+    <!-- Existing Bootstrap and CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Website heading -->
+    <header>
+        <h1>Daily Digest</h1>
+        <p>Your Magazine. Your Interests. Your Content.</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="signup.html">Subscribe</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="cart.html">Shopping Cart</a>
+        <a href="billing.html">Billing Details</a>
+        <a href="returns.html">Returns</a>
+    </nav>
+
+    <main class="container">
+
+        <h2>Billing Details</h2>
+        <p>Enter your billing and shipping information to complete your order.</p>
+
+        <!-- Billing form -->
+        <form id="billingForm">
+
+            <h3>Customer Information</h3>
+
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" name="fullName"
+                   class="form-control" required>
+
+            <br>
+
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email"
+                   class="form-control" required>
+
+            <br>
+
+            <!-- Billing address -->
+            <h3>Billing Address</h3>
+
+            <label for="address">Street Address:</label>
+            <input type="text" id="address" name="address"
+                   class="form-control" required>
+
+            <br>
+
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city"
+                   class="form-control" required>
+
+            <br>
+
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state"
+                   class="form-control" required>
+
+            <br>
+
+            <label for="zipCode">ZIP Code:</label>
+            <input type="text" id="zipCode" name="zipCode"
+                   class="form-control" pattern="[0-9]{5}(-[0-9]{4})?"
+                   required>
+
+            <br>
+
+            <!-- Payment information -->
+            <h3>Payment Information</h3>
+            <p>Use test payment information only.</p>
+
+            <label for="cardName">Name on Card:</label>
+            <input type="text" id="cardName" name="cardName"
+                   class="form-control" autocomplete="cc-name" required>
+
+            <br>
+
+            <label for="cardNumber">Credit Card Number:</label>
+            <input type="text" id="cardNumber" name="cardNumber"
+                   class="form-control" inputmode="numeric"
+                   autocomplete="cc-number" pattern="[0-9]{13,19}"
+                   placeholder="Enter test card number" required>
+
+            <br>
+
+            <label for="expirationDate">Expiration Date:</label>
+            <input type="month" id="expirationDate"
+                   name="expirationDate" class="form-control"
+                   autocomplete="cc-exp" required>
+
+            <br>
+
+            <label for="securityCode">Security Code (CVV):</label>
+            <input type="password" id="securityCode"
+                   name="securityCode" class="form-control"
+                   inputmode="numeric" pattern="[0-9]{3,4}"
+                   maxlength="4" autocomplete="cc-csc" required>
+
+            <br>
+
+            <!-- Shipping details -->
+            <h3>Shipping Details</h3>
+
+            <label for="shippingMethod">Shipping Method:</label>
+            <select id="shippingMethod" name="shippingMethod"
+                    class="form-select" required>
+                <option value="">Select a shipping method</option>
+                <option value="Standard">Standard Shipping</option>
+                <option value="Express">Express Shipping</option>
+                <option value="Digital">Digital Delivery</option>
+            </select>
+
+            <br>
+
+            <label for="shippingNotes">Delivery Instructions:</label>
+            <textarea id="shippingNotes" name="shippingNotes"
+                      class="form-control" rows="3"
+                      placeholder="Optional delivery instructions"></textarea>
+
+            <br>
+
+            <!-- Order summary -->
+            <h3>Order Summary</h3>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+
+                <tbody id="orderItems">
+                    <tr>
+                        <td colspan="3">Your cart items will appear here.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>Subtotal: $<span id="orderSubtotal">0.00</span></p>
+            <p>Shipping: $<span id="shippingCost">0.00</span></p>
+            <h4>Total: $<span id="orderTotal">0.00</span></h4>
+
+            <br>
+
+            <!-- Form buttons -->
+            <button type="submit" id="submitBilling"
+                    class="btn btn-primary">
+                Place Order
+            </button>
+
+            <button type="reset" id="clearBilling"
+                    class="btn btn-secondary">
+                Clear Form
+            </button>
+
+            <p id="billingMessage" role="status"></p>
+
+        </form>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Daily Digest. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
