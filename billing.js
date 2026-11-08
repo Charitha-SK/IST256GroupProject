@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitButton = document.getElementById("submitBilling");
     const shippingSelect = document.getElementById("shippingMethod");
     const apiUrl = "/api/billing";
+    const requestTimeoutMs = 10000;   
+    const approvalPollMs = 1000;  
+    const approvalMaxChecks = 15;
 
     if (!form) return;
 
@@ -170,10 +173,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return errors;
     }
+    
 
-    function requestError(response) {
-        if (response.status === 0) return "Could not connect to the billing service.";
+    async function requestError(response) {
+        let serverMessage = "";
+        try {
+            const data = await response.json();
+            if (data && typeof data.error === "string") serverMessage = data.error;
+        } catch (error) {
+            // No JSON body, so fall back to the generic message below
+        }
+ 
+        if (serverMessage) {
+            return serverMessage + " (HTTP " + response.status + ")";
+        }
         return "Billing request failed (HTTP " + response.status + "). Please try again.";
+    }
+    
+
+    async function sendRequest(url, options) {
+        const controller = new AbortController();
+        const timer = window.setTimeout(function () {
+            controller.abort();
+        }, requestTimeoutMs);
+ 
+        let response;
+        try {
+            response = await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+        } catch (error) {
+            if (error.name === "AbortError") {
+                throw new Error("The billing service took too long to respond. Please try again.");
+            }
+            throw new Error("Could not connect to the billing service.");
+        } finally {
+            window.clearTimeout(timer);
+        }
+ 
+        if (!response.ok) throw new Error(await requestError(response));
+ 
+        try {
+            return await response.json();
+        } catch (error) {
+            throw new Error("The billing service sent a response that could not be read.");
+        }
+    }
+ 
+    function pause(milliseconds) {
+        return new Promise(function (resolve) {
+            window.setTimeout(resolve, milliseconds);
+        });
+    }
+ 
+
+    async function waitForApproval(orderId) {
+        let decision = { orderId: orderId, status: "Pending" };
+ 
+        for (let check = 0; check < approvalMaxChecks && decision.status === "Pending"; check++) {
+            await pause(approvalPollMs);
+            decision = await sendRequest(apiUrl + "/" + encodeURIComponent(orderId), {
+                headers: { "Accept": "application/json" }
+            });
+        }
+ 
+        return decision;
     }
 
     shippingSelect.addEventListener("change", updateTotals);
@@ -241,7 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
         submitButton.disabled = true;
         showMessage("Submitting order...", false);
         try {
-            const response = await fetch(apiUrl, {
+            const created = await sendRequest(apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -249,12 +311,31 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify(payload)
             });
-            if (!response.ok) throw new Error(requestError(response));
 
             orderSubmitted = true;
             document.getElementById("cardNumber").value = "";
             document.getElementById("securityCode").value = "";
-            showMessage("Order request submitted successfully.", false);
+            showMessage("Order " + created.orderId + " received. Waiting for approval...", false);
+            let decision;
+            try {
+                decision = await waitForApproval(created.orderId);
+            } catch (error) {
+                showMessage("Order " + created.orderId + " was received, but its approval status " +
+                    "could not be checked: " + error.message, true);
+                return;
+            }
+ 
+            if (decision.status === "Approved") {
+                showMessage("Order " + decision.orderId + " approved. Total: $" +
+                    money(decision.total) + ". " + (decision.message || ""), false);
+            } else if (decision.status === "Declined") {
+                orderSubmitted = false;   // let the customer fix the details and try again
+                showMessage("Order " + decision.orderId + " was declined. " +
+                    (decision.message || "") + " Please check your details and try again.", true);
+            } else {
+                showMessage("Order " + decision.orderId + " is still awaiting approval. " +
+                    "Please check back soon.", false);
+            }
         } catch (error) {
             showMessage(error.message || "Could not submit the order.", true);
         } finally {
