@@ -1,1 +1,34 @@
-
+{
+  "customer": {
+    "fullName": "Jane Doe",
+    "email": "jane.doe@example.com",
+    "address": "123 College Ave",
+    "city": "State College",
+    "state": "PA",
+    "zipCode": "16801"
+  },
+  "items": [
+    {
+      "productId": "DD-001",
+      "description": "Campus Tech Fair Recap",
+      "unitOfMeasure": "Digital",
+      "price": 1.99,
+      "quantity": 2
+    },
+    {
+      "productId": "DD-002",
+      "description": "Quiet Hours Photo Essay",
+      "unitOfMeasure": "Digital",
+      "price": 2.49,
+      "quantity": 1
+    }
+  ],
+  "shipping": {
+    "method": "Digital",
+    "instructions": "",
+    "cost": 0
+  },
+  "subtotal": 6.47,
+  "total": 6.47,
+  "paymentMethod": "card"
+}
