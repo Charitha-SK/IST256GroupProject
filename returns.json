@@ -5,14 +5,14 @@
   },
   "orderNumber": "DD-1A2B3C45",
   "product": {
-    "productId": "DD-007",
-    "productName": "Daily Digest Tote Bag",
-    "price": 14.99,
+    "productId": "DD-002",
+    "productName": "Quite Hours Photo Essay",
+    "price": 2.49,
     "quantity": 1
   },
   "purchaseDate": "2026-11-01",
-  "reason": "Damaged",
-  "condition": "Damaged",
-  "details": "The tote bag is torn.",
+  "reason": "Not As Described",
+  "condition": "Opened",
+  "details": "The photo essay was not as described.",
   "preferredResolution": "Refund"
 }
