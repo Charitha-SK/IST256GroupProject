@@ -1,41 +1,60 @@
 
-// cart.js
+// cart.js - Daily Digest Shopping Cart
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Starting products
-    let products = [
-        { productId: "DD-001", description: "Campus Tech Fair Recap", category: "Technology", unitOfMeasure: "Digital", price: 1.99 },
-        { productId: "DD-002", description: "Quiet Hours Photo Essay", category: "Lifestyle", unitOfMeasure: "Digital", price: 2.49 },
-        { productId: "DD-003", description: "Five-Minute Reset", category: "Lifestyle", unitOfMeasure: "Digital", price: 0.99 },
-        { productId: "DD-004", description: "Student Budget Meal Guide", category: "Lifestyle", unitOfMeasure: "Digital", price: 1.49 },
-        { productId: "DD-005", description: "Best Reads of the Semester", category: "Books", unitOfMeasure: "Digital", price: 1.79 },
-        { productId: "DD-006", description: "Daily Digest Reading List Set", category: "Books", unitOfMeasure: "Set", price: 12.99 },
-        { productId: "DD-007", description: "Daily Digest Tote Bag", category: "Accessories", unitOfMeasure: "Each", price: 14.99 },
-        { productId: "DD-008", description: "Dorm Room Refresh Guide", category: "Home", unitOfMeasure: "Digital", price: 2.29 },
-        { productId: "DD-009", description: "Daily Digest Monthly Pass", category: "Lifestyle", unitOfMeasure: "Subscription", price: 7.99 },
-        { productId: "DD-010", description: "Study Gadgets Roundup", category: "Technology", unitOfMeasure: "Digital", price: 1.99 }
-    ];
-
+    let products = [];
     let cart = [];
     let editingId = "";
 
-    // Load saved data
-    let savedProducts = localStorage.getItem("dailyDigestProducts");
-    let savedCart = localStorage.getItem("dailyDigestCart");
+    // Load products from the MongoDB database
+    async function loadProducts() {
+        try {
+            const response = await fetch("/api/products");
 
-    if (savedProducts !== null) {
-        products = JSON.parse(savedProducts);
+            if (!response.ok) {
+                throw new Error("Could not load products.");
+            }
+
+            const data = await response.json();
+
+            products = data.products || [];
+            showProducts($("#searchInput").val() || "");
+
+            return true;
+
+        } catch (error) {
+            document.getElementById("formMessage").textContent =
+                "Could not load products from the database.";
+
+            console.error(error);
+            return false;
+        }
     }
 
-    if (savedCart !== null) {
-        cart = JSON.parse(savedCart);
-    }
+    // Load shopping cart from the MongoDB database
+    async function loadCart() {
+        try {
+            const response = await fetch("/api/cart");
 
-    // Save data in localStorage
-    function saveData() {
-        localStorage.setItem("dailyDigestProducts", JSON.stringify(products));
-        localStorage.setItem("dailyDigestCart", JSON.stringify(cart));
+            if (!response.ok) {
+                throw new Error("Could not load cart.");
+            }
+
+            const data = await response.json();
+
+            cart = data.cart || [];
+            showCart();
+
+            return true;
+
+        } catch (error) {
+            document.getElementById("cartMessage").textContent =
+                "Could not load shopping cart from the database.";
+
+            console.error(error);
+            return false;
+        }
     }
 
     // Display available products
@@ -52,7 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < products.length; i++) {
             let p = products[i];
 
-            let text = (p.productId + p.description + p.category).toLowerCase();
+            let text = (
+                p.productId + p.description + p.category
+            ).toLowerCase();
 
             if (text.includes(search.toLowerCase())) {
                 matches++;
@@ -61,7 +82,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 div.className = "border rounded p-3 mb-2";
 
                 let info = document.createElement("p");
-                info.textContent = p.description + " - $" + p.price.toFixed(2);
+                info.textContent =
+                    p.description + " - $" + Number(p.price).toFixed(2);
 
                 let addButton = document.createElement("button");
                 addButton.textContent = "Add to Cart";
@@ -82,6 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 div.appendChild(info);
                 div.appendChild(addButton);
                 div.appendChild(editButton);
+
                 results.appendChild(div);
             }
         }
@@ -90,27 +113,34 @@ document.addEventListener("DOMContentLoaded", function () {
             matches === 0 ? "No matching products found." : "";
     }
 
-    // Add a product to the shopping cart
-    function addToCart(id) {
-        let found = false;
+    // Add a product to the shopping cart in MongoDB
+    async function addToCart(id) {
+        try {
+            const response = await fetch("/api/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    productId: id
+                })
+            });
 
-        for (let i = 0; i < cart.length; i++) {
-            if (cart[i].productId === id) {
-                cart[i].quantity++;
-                found = true;
-                break;
+            if (!response.ok) {
+                throw new Error("Could not add product to cart.");
             }
+
+            await loadCart();
+
+            document.getElementById("cartMessage").textContent =
+                "Product added to cart!";
+
+        } catch (error) {
+            document.getElementById("cartMessage").textContent =
+                "Could not add product to cart.";
+
+            console.error(error);
         }
-
-        if (found === false) {
-            cart.push({ productId: id, quantity: 1 });
-        }
-
-        saveData();
-        showCart();
-
-        document.getElementById("cartMessage").textContent =
-            "Product added to cart!";
     }
 
     // Display shopping cart
@@ -121,75 +151,134 @@ document.addEventListener("DOMContentLoaded", function () {
         let total = 0;
 
         for (let i = 0; i < cart.length; i++) {
-            let item = cart[i];
+            const item = cart[i];
 
-            for (let j = 0; j < products.length; j++) {
-                let p = products[j];
+            const p = products.find(function (product) {
+                return product.productId === item.productId;
+            });
 
-                if (item.productId === p.productId) {
-                    let row = document.createElement("tr");
+            let row = document.createElement("tr");
 
-                    let values = [
-                        p.productId,
-                        p.description,
-                        p.category,
-                        p.unitOfMeasure,
-                        "$" + p.price.toFixed(2)
-                    ];
+            let values = [
+                item.productId,
+                p ? p.description : "Product unavailable",
+                p ? p.category : "",
+                p ? p.unitOfMeasure : "",
+                p ? "$" + Number(p.price).toFixed(2) : ""
+            ];
 
-                    for (let k = 0; k < values.length; k++) {
-                        let cell = row.insertCell();
-                        cell.textContent = values[k];
-                    }
+            for (let k = 0; k < values.length; k++) {
+                let cell = row.insertCell();
+                cell.textContent = values[k];
+            }
 
-                    // Quantity input
-                    let quantity = document.createElement("input");
-                    quantity.type = "number";
-                    quantity.min = "1";
-                    quantity.step = "1";
-                    quantity.value = item.quantity;
-                    quantity.className = "form-control";
+            // Quantity input
+            let quantity = document.createElement("input");
+            quantity.type = "number";
+            quantity.min = "1";
+            quantity.step = "1";
+            quantity.value = item.quantity;
+            quantity.className = "form-control";
 
-                    quantity.onchange = function () {
-                        let number = Number(quantity.value);
+            quantity.onchange = function () {
+                let number = Number(quantity.value);
 
-                        if (number < 1 || number % 1 !== 0 || quantity.value === "") {
-                            document.getElementById("cartMessage").textContent =
-                                "Please enter a valid quantity.";
-                            showCart();
-                        } else {
-                            item.quantity = number;
-                            saveData();
-                            showCart();
-                        }
-                    };
+                if (
+                    number < 1 ||
+                    number % 1 !== 0 ||
+                    quantity.value === ""
+                ) {
+                    document.getElementById("cartMessage").textContent =
+                        "Please enter a valid quantity.";
 
-                    row.insertCell().appendChild(quantity);
-
-                    // Remove button
-                    let removeButton = document.createElement("button");
-                    removeButton.textContent = "Remove";
-                    removeButton.className = "btn btn-danger btn-sm";
-
-                    removeButton.onclick = function () {
-                        cart.splice(i, 1);
-                        saveData();
-                        showCart();
-
-                        document.getElementById("cartMessage").textContent =
-                            "Product removed from cart!";
-                    };
-
-                    row.insertCell().appendChild(removeButton);
-                    table.appendChild(row);
-
-                    total = total + (p.price * item.quantity);
-                    break;
+                    showCart();
+                } else {
+                    updateCartQuantity(item.productId, number);
                 }
+            };
+
+            row.insertCell().appendChild(quantity);
+
+            // Remove button
+            let removeButton = document.createElement("button");
+            removeButton.textContent = "Remove";
+            removeButton.className = "btn btn-danger btn-sm";
+
+            removeButton.onclick = function () {
+                removeFromCart(item.productId);
+            };
+
+            row.insertCell().appendChild(removeButton);
+
+            table.appendChild(row);
+
+            if (p) {
+                total = total + (Number(p.price) * item.quantity);
             }
         }
 
-        document.getElementById("cartTotal").textContent = total.toFixed(2);
+        document.getElementById("cartTotal").textContent =
+            total.toFixed(2);
+    }
+
+    // Update cart quantity in MongoDB
+    async function updateCartQuantity(id, quantity) {
+        try {
+            const response = await fetch(
+                "/api/cart/" + encodeURIComponent(id),
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Could not update cart quantity.");
+            }
+
+            await loadCart();
+
+            document.getElementById("cartMessage").textContent =
+                "Cart quantity updated successfully!";
+
+        } catch (error) {
+            document.getElementById("cartMessage").textContent =
+                "Could not update cart quantity.";
+
+            console.error(error);
+        }
+    }
+
+    // Remove a product from the MongoDB shopping cart
+    async function removeFromCart(id) {
+        try {
+            const response = await fetch(
+                "/api/cart/" + encodeURIComponent(id),
+                {
+                    method: "DELETE"
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Could not remove product from cart.");
+            }
+
+            await loadCart();
+
+            document.getElementById("cartMessage").textContent =
+                "Product removed from cart!";
+
+        } catch (error) {
+            document.getElementById("cartMessage").textContent =
+                "Could not remove product from cart.";
+
+            console.error(error);
+        }
     }
 
     // Edit product information
@@ -201,11 +290,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("productId").value = p.productId;
                 document.getElementById("description").value = p.description;
                 document.getElementById("category").value = p.category;
-                document.getElementById("unitOfMeasure").value = p.unitOfMeasure;
+                document.getElementById("unitOfMeasure").value =
+                    p.unitOfMeasure;
                 document.getElementById("price").value = p.price;
 
                 editingId = id;
-                document.getElementById("saveButton").textContent = "Update Product";
+
+                document.getElementById("saveButton").textContent =
+                    "Update Product";
+
                 break;
             }
         }
@@ -214,7 +307,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear product form
     function clearForm() {
         document.getElementById("productForm").reset();
-        document.getElementById("saveButton").textContent = "Save Product";
+
+        document.getElementById("saveButton").textContent =
+            "Save Product";
+
         editingId = "";
     }
 
@@ -224,11 +320,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let form = document.getElementById("productForm");
     form.noValidate = true;
 
-    form.onsubmit = function (event) {
+    form.onsubmit = async function (event) {
         event.preventDefault();
 
         let id = document.getElementById("productId").value.trim();
-        let description = document.getElementById("description").value.trim();
+        let description =
+            document.getElementById("description").value.trim();
         let category = document.getElementById("category").value;
         let unit = document.getElementById("unitOfMeasure").value;
         let priceText = document.getElementById("price").value;
@@ -236,10 +333,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let message = document.getElementById("formMessage");
 
-        if (id === "" || description === "" || category === "" ||
-            unit === "" || priceText === "" || isNaN(price) ||
-            price < 0 || priceText.split(".")[1] && priceText.split(".")[1].length > 2) {
-            message.textContent = "Please enter valid product information.";
+        if (
+            id === "" ||
+            description === "" ||
+            category === "" ||
+            unit === "" ||
+            priceText === "" ||
+            !Number.isFinite(price) ||
+            price < 0 ||
+            (priceText.split(".")[1] &&
+                priceText.split(".")[1].length > 2)
+        ) {
+            message.textContent =
+                "Please enter valid product information.";
             return;
         }
 
@@ -251,6 +357,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
+        // Keep the original product ID when editing
+        if (editingId !== "" && id !== editingId) {
+            message.textContent =
+                "Product ID cannot be changed when editing.";
+            return;
+        }
+
         let product = {
             productId: id,
             description: description,
@@ -259,31 +372,53 @@ document.addEventListener("DOMContentLoaded", function () {
             price: price
         };
 
-        if (editingId !== "") {
-            for (let i = 0; i < products.length; i++) {
-                if (products[i].productId === editingId) {
-                    products[i] = product;
-                    break;
-                }
+        const wasEditing = editingId !== "";
+        const originalId = editingId;
+
+        try {
+            let response;
+
+            if (wasEditing) {
+                // Update product in MongoDB
+                response = await fetch(
+                    "/api/products/" + encodeURIComponent(originalId),
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(product)
+                    }
+                );
+            } else {
+                // Add product to MongoDB
+                response = await fetch("/api/products", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(product)
+                });
             }
 
-            // Update ID in cart if it changed
-            for (let i = 0; i < cart.length; i++) {
-                if (cart[i].productId === editingId) {
-                    cart[i].productId = id;
-                }
+            if (!response.ok) {
+                throw new Error("Could not save product.");
             }
 
-            message.textContent = "Product updated successfully!";
-        } else {
-            products.push(product);
-            message.textContent = "Product added successfully!";
+            clearForm();
+
+            await loadProducts();
+
+            message.textContent = wasEditing
+                ? "Product updated successfully!"
+                : "Product added successfully!";
+
+        } catch (error) {
+            message.textContent =
+                "Could not save product to the database.";
+
+            console.error(error);
         }
-
-        saveData();
-        showProducts();
-        showCart();
-        clearForm();
     };
 
     // Prepare cart information as JSON
@@ -300,7 +435,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         description: p.description,
                         category: p.category,
                         unitOfMeasure: p.unitOfMeasure,
-                        price: p.price,
+                        price: Number(p.price),
                         quantity: cart[i].quantity
                     });
                 }
@@ -324,10 +459,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let cartData = {
             products: items,
-            total: Number(document.getElementById("cartTotal").textContent)
+            total: Number(
+                document.getElementById("cartTotal").textContent
+            )
         };
 
         preview.textContent = JSON.stringify(cartData, null, 2);
+
         message.textContent = "Cart JSON prepared successfully!";
     };
 
@@ -340,40 +478,21 @@ document.addEventListener("DOMContentLoaded", function () {
         addToCart: addToCart
     };
 
-    //search
+    // Search products using jQuery
     $("#searchInput").on("input", function () {
-        let results = document.getElementById("productResults");
         const search = $(this).val().trim().toLowerCase();
-
-        let matches = 0;
-
-        results.find("tr").each(function () {
-
-            // Search the product information
-            const itemText = $(this)
-                .text()
-                .toLowerCase();
-
-            const isMatch = rowText.includes(search);
-
-            // jQuery shows or hides matching rows
-            $(this).toggle(isMatch);
-
-            if (isMatch) {
-                matches++;
-            }
-        });
-
-        // Display message when no matches are found
-        $("#searchMessage").text(
-            search !== "" && matches === 0
-                ? "No matching products found."
-                : ""
-        );
+        showProducts(search);
     });
 
-    // Display products and cart when page opens
-    showProducts();
-    showCart();
+    // Load products and cart when page opens
+    async function initializeCart() {
+        const productsLoaded = await loadProducts();
+
+        if (productsLoaded) {
+            await loadCart();
+        }
+    }
+
+    initializeCart();
 
 });
