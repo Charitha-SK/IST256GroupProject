@@ -287,7 +287,7 @@ router.get("/billing/:orderId", async function(req, res) {
   }
 });
 
-// READ
+// READ- get all shipping records
 router.get("/shipping", async function(req, res) {
   try {
     const shipping = await Shipping.find();
