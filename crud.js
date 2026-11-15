@@ -1,4 +1,4 @@
-// Routes that save that store data in MongoDB with Mongoose. 
+// Routes that save the store data in MongoDB with Mongoose. 
 // Products and cart: full crud (create, read, update, delete)
 // Shipping, billing, returns: create and read only 
 
