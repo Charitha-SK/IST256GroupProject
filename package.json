@@ -1,0 +1,14 @@
+{
+  "name": "daily-digest-storefront",
+  "version": "1.0.0",
+  "description": "IST 256 Group Project - Daily Digest Storefront with Express and MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node --env-file-if-exists=.env create_database.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.13.2"
+  }
+}
