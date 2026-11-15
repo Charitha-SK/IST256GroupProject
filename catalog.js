@@ -10,40 +10,27 @@ $(function () {
     let products = [];
     let editingId = null;
 
-    // Load products from localStorage or products.json
-    function loadProducts() {
-        const saved = localStorage.getItem("dailyDigestProducts");
+    // Load products from the MongoDB database using the API
+    async function loadProducts() {
+        try {
+            const response = await fetch("/api/products");
 
-        if (saved !== null) {
-            try {
-                const parsed = JSON.parse(saved);
-
-                if (Array.isArray(parsed)) {
-                    products = parsed;
-                    showProducts();
-                    return;
-                }
-            } catch (err) {
-                console.log("Could not load saved products.", err);
+            if (!response.ok) {
+                throw new Error("Could not load products.");
             }
-        }
 
-        // jQuery AJAX: load products from JSON
-        $.getJSON("products.json", function (data) {
+            const data = await response.json();
+
             products = data.products;
             showProducts();
-        }).fail(function () {
-            showMessage("Could not load products.json.", "red");
-        });
-    }
 
-    // Save products in localStorage
-    function saveProducts() {
-        localStorage.setItem(
-            "dailyDigestProducts",
-            JSON.stringify(products)
-        );
-        showProducts();
+            return true;
+
+        } catch (error) {
+            showMessage("Could not load products from the database.", "red");
+            console.error(error);
+            return false;
+        }
     }
 
     // Display messages using jQuery
@@ -126,22 +113,39 @@ $(function () {
         $productForm[0].scrollIntoView();
     }
 
-    // Delete a product
-    function deleteProduct(id) {
-        products = products.filter(function (product) {
-            return product.productId !== id;
-        });
+    // Delete a product from the MongoDB database
+    async function deleteProduct(id) {
+        try {
+            const response = await fetch(
+                "/api/products/" + encodeURIComponent(id),
+                {
+                    method: "DELETE"
+                }
+            );
 
-        if (editingId === id) {
-            clearForm();
+            if (!response.ok) {
+                throw new Error("Could not delete product.");
+            }
+
+            products = products.filter(function (product) {
+                return product.productId !== id;
+            });
+
+            if (editingId === id) {
+                clearForm();
+            }
+
+            showProducts();
+
+            showMessage(
+                "Product deleted successfully.",
+                "green"
+            );
+
+        } catch (error) {
+            showMessage("Could not delete product from the database.", "red");
+            console.error(error);
         }
-
-        saveProducts();
-
-        showMessage(
-            "Product deleted successfully.",
-            "green"
-        );
     }
 
     // Clear the product form
@@ -154,8 +158,8 @@ $(function () {
         $formMessage.text("");
     }
 
-    // Add or update products using jQuery
-    $productForm.on("submit", function (event) {
+    // Add or update products using the API
+    $productForm.on("submit", async function (event) {
         event.preventDefault();
 
         // Retrieve form values using jQuery
@@ -176,10 +180,7 @@ $(function () {
             !Number.isFinite(price) ||
             price < 0
         ) {
-            showMessage(
-                "Please complete all fields with a valid price.",
-                "red"
-            );
+            showMessage("Please complete all fields with a valid price.", "red");
             return;
         }
 
@@ -196,51 +197,71 @@ $(function () {
             return p.productId === id;
         });
 
-        let successMessage;
-
         if (editingId !== null) {
-            // Update existing product
-            const index = products.findIndex(function (p) {
-                return p.productId === editingId;
-            });
-
             if (sameId !== -1 && id !== editingId) {
-                showMessage(
-                    "That Product ID already exists.",
-                    "red"
-                );
+                showMessage("That Product ID already exists.", "red");
                 return;
             }
-
-            if (index === -1) {
-                showMessage(
-                    "Product no longer exists.",
-                    "red"
-                );
-                return;
-            }
-
-            products[index] = product;
-            successMessage = "Product updated successfully.";
-
-        } else {
-            // Add new product
-            if (sameId !== -1) {
-                showMessage(
-                    "That Product ID already exists.",
-                    "red"
-                );
-                return;
-            }
-
-            products.push(product);
-            successMessage = "Product added successfully.";
+        } else if (sameId !== -1) {
+            showMessage("That Product ID already exists.", "red");
+            return;
         }
 
-        saveProducts();
-        clearForm();
+        const wasEditing = editingId !== null;
+        const originalId = editingId;
 
-        showMessage(successMessage, "green");
+        try {
+            let response;
+
+            if (wasEditing) {
+                // Update existing product in MongoDB
+                response = await fetch(
+                    "/api/products/" + encodeURIComponent(originalId),
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(product)
+                    }
+                );
+            } else {
+                // Add new product to MongoDB
+                response = await fetch("/api/products", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(product)
+                });
+            }
+
+            if (!response.ok) {
+                throw new Error("Could not save product.");
+            }
+
+            clearForm();
+
+            const loaded = await loadProducts();
+
+            if (loaded) {
+                showMessage(
+                    wasEditing
+                        ? "Product updated successfully."
+                        : "Product added successfully.",
+                    "green"
+                );
+            } else {
+                showMessage(
+                    "Product saved, but the catalog could not refresh.",
+                    "red"
+                );
+            }
+
+        } catch (error) {
+            showMessage("Could not save product to the database.", "red");
+            console.error(error);
+        }
     });
 
     // Clear button using jQuery
