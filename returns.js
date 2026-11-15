@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("returnForm");
     const searchInput = document.getElementById("returnSearch");
@@ -7,11 +8,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const message = document.getElementById("returnMessage");
     const searchMessage = document.getElementById("searchMessage");
     const submitButton = document.getElementById("submitReturn");
+
+    const productsUrl = "/api/products";
     const apiUrl = "/api/returns";
 
     if (!form) return;
 
     form.noValidate = true;
+
     let products = [];
     let requestSubmitted = false;
 
@@ -28,11 +32,14 @@ document.addEventListener("DOMContentLoaded", function () {
             product.category,
             product.unitOfMeasure
         ].join(" ").toLowerCase();
+
         return searchable.includes(query);
     }
 
+    // Display products retrieved from MongoDB
     function renderProducts(query) {
         productList.replaceChildren();
+
         const matches = products.filter(function (product) {
             return productMatches(product, query);
         });
@@ -40,35 +47,47 @@ document.addEventListener("DOMContentLoaded", function () {
         if (matches.length === 0) {
             const row = document.createElement("tr");
             const cell = document.createElement("td");
+
             cell.colSpan = 5;
             cell.textContent = "No matching products found.";
+
             row.appendChild(cell);
             productList.appendChild(row);
+
             searchMessage.textContent = "No matching products found.";
             return;
         }
 
         searchMessage.textContent = "";
+
         matches.forEach(function (product) {
             const row = document.createElement("tr");
+
             const imageCell = document.createElement("td");
             imageCell.textContent = "No image available";
+
             const nameCell = document.createElement("td");
             nameCell.textContent = product.description;
+
             const priceCell = document.createElement("td");
             priceCell.textContent = "$" + Number(product.price).toFixed(2);
+
             const quantityCell = document.createElement("td");
             quantityCell.textContent = "Not provided";
+
             const selectCell = document.createElement("td");
             const button = document.createElement("button");
+
             button.type = "button";
             button.className = "btn btn-sm btn-outline-primary";
             button.textContent = "Select";
+
             button.addEventListener("click", function () {
                 productSelect.value = product.productId;
                 productSelect.dispatchEvent(new Event("change"));
                 productSelect.focus();
             });
+
             selectCell.appendChild(button);
             row.append(imageCell, nameCell, priceCell, quantityCell, selectCell);
             productList.appendChild(row);
@@ -79,28 +98,35 @@ document.addEventListener("DOMContentLoaded", function () {
         const selected = products.find(function (product) {
             return product.productId === productSelect.value;
         });
+
         const image = document.getElementById("returnProductImage");
+
         document.getElementById("selectedProductName").textContent =
             selected ? selected.description : "";
+
         document.getElementById("selectedProductPrice").textContent =
             selected ? Number(selected.price).toFixed(2) : "0.00";
 
-        // The current products.json does not provide image paths.
+        // The backend product schema does not currently provide image paths
         image.hidden = true;
         image.removeAttribute("src");
     }
 
+    // Validate the return form
     function validateForm() {
         form.querySelectorAll(".is-invalid").forEach(function (field) {
             field.classList.remove("is-invalid");
             field.removeAttribute("aria-invalid");
         });
 
-        const invalidFields = Array.from(form.querySelectorAll("input, select, textarea"))
-            .filter(function (field) {
-                return !field.checkValidity();
-            });
+        const invalidFields = Array.from(
+            form.querySelectorAll("input, select, textarea")
+        ).filter(function (field) {
+            return !field.checkValidity();
+        });
+
         const errors = [];
+
         if (invalidFields.length > 0) {
             errors.push("Complete all required fields using the requested formats.");
         }
@@ -108,35 +134,43 @@ document.addEventListener("DOMContentLoaded", function () {
         const selected = products.find(function (product) {
             return product.productId === productSelect.value;
         });
+
         if (!selected) {
             invalidFields.push(productSelect);
             errors.push("Select a product from the available product list.");
         }
 
         if (requestSubmitted) {
-            errors.push("This return request was already submitted. Clear the form to submit another.");
+            errors.push(
+                "This return request was already submitted. Clear the form to submit another."
+            );
         }
 
         const quantityField = document.getElementById("returnQuantity");
         const quantity = Number(quantityField.value);
+
         if (!Number.isInteger(quantity) || quantity < 1) {
             invalidFields.push(quantityField);
             errors.push("Return quantity must be a whole number greater than zero.");
         }
 
         const purchaseDate = document.getElementById("purchaseDate").value;
+
         const now = new Date();
         const today = now.getFullYear() + "-" +
             String(now.getMonth() + 1).padStart(2, "0") + "-" +
             String(now.getDate()).padStart(2, "0");
+
         if (purchaseDate && purchaseDate > today) {
             const dateField = document.getElementById("purchaseDate");
             invalidFields.push(dateField);
             errors.push("Purchase date cannot be in the future.");
         }
 
-        if (document.getElementById("returnReason").value === "Other" &&
-            document.getElementById("returnDetails").value.trim() === "") {
+        if (
+            document.getElementById("returnReason").value === "Other" &&
+            document.getElementById("returnDetails").value.trim() === ""
+        ) {
             const detailsField = document.getElementById("returnDetails");
             invalidFields.push(detailsField);
             errors.push("Add details when selecting Other as the return reason.");
@@ -146,22 +180,46 @@ document.addEventListener("DOMContentLoaded", function () {
             field.classList.add("is-invalid");
             field.setAttribute("aria-invalid", "true");
         });
+
         return errors;
     }
 
-    function requestError(response) {
-        if (response.status === 0) return "Could not connect to the returns service.";
-        return "Return request failed (HTTP " + response.status + "). Please try again.";
+    // Handle backend errors
+    async function requestError(response) {
+        let serverMessage = "";
+
+        try {
+            const responseText = await response.text();
+
+            if (responseText) {
+                try {
+                    const data = JSON.parse(responseText);
+                    serverMessage = data.error || responseText;
+                } catch (error) {
+                    serverMessage = responseText;
+                }
+            }
+        } catch (error) {
+            // Use the generic message below
+        }
+
+        return serverMessage
+            ? serverMessage + " (HTTP " + response.status + ")"
+            : "Return request failed (HTTP " + response.status + "). Please try again.";
     }
 
+    // Search products
     searchButton.addEventListener("click", function () {
         renderProducts(searchInput.value.trim().toLowerCase());
     });
+
     searchInput.addEventListener("input", function () {
         renderProducts(searchInput.value.trim().toLowerCase());
     });
+
     productSelect.addEventListener("change", function () {
         updateSelectedProduct();
+
         productSelect.classList.remove("is-invalid");
         productSelect.removeAttribute("aria-invalid");
     });
@@ -171,50 +229,65 @@ document.addEventListener("DOMContentLoaded", function () {
         event.target.removeAttribute("aria-invalid");
         showMessage("", false);
     });
+
     form.addEventListener("change", function (event) {
         event.target.classList.remove("is-invalid");
         event.target.removeAttribute("aria-invalid");
         showMessage("", false);
     });
+
     form.addEventListener("reset", function () {
         window.setTimeout(function () {
             requestSubmitted = false;
             submitButton.disabled = false;
+
             form.querySelectorAll(".is-invalid").forEach(function (field) {
                 field.classList.remove("is-invalid");
                 field.removeAttribute("aria-invalid");
             });
+
             updateSelectedProduct();
             renderProducts(searchInput.value.trim().toLowerCase());
             showMessage("", false);
         }, 0);
     });
 
+    // Submit a return request to MongoDB
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
+
         const errors = validateForm();
+
         if (errors.length > 0) {
             showMessage(errors.join(" "), true);
+
             const firstInvalid = form.querySelector(".is-invalid");
             if (firstInvalid) firstInvalid.focus();
+
             return;
         }
 
         const product = products.find(function (item) {
             return item.productId === productSelect.value;
         });
+
         const payload = {
             customer: {
                 fullName: document.getElementById("customerName").value.trim(),
                 email: document.getElementById("returnEmail").value.trim()
             },
+
             orderNumber: document.getElementById("orderNumber").value.trim(),
+
             product: {
                 productId: product.productId,
                 productName: product.description,
                 price: Number(product.price),
-                quantity: Number(document.getElementById("returnQuantity").value)
+                quantity: Number(
+                    document.getElementById("returnQuantity").value
+                )
             },
+
             purchaseDate: document.getElementById("purchaseDate").value,
             reason: document.getElementById("returnReason").value,
             condition: document.getElementById("productCondition").value,
@@ -224,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         submitButton.disabled = true;
         showMessage("Submitting return request...", false);
+
         try {
             const response = await fetch(apiUrl, {
                 method: "POST",
@@ -233,51 +307,109 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify(payload)
             });
-            if (!response.ok) throw new Error(requestError(response));
+
+            if (!response.ok) {
+                throw new Error(await requestError(response));
+            }
+
             requestSubmitted = true;
-            showMessage("Return request submitted successfully.", false);
+
+            showMessage(
+                "Return request submitted successfully and saved to the database.",
+                false
+            );
+
         } catch (error) {
-            showMessage(error.message || "Could not submit the return request.", true);
+            showMessage(
+                error.message || "Could not submit the return request.",
+                true
+            );
         } finally {
             submitButton.disabled = requestSubmitted;
         }
     });
 
+    // Load products from MongoDB
     async function loadProducts() {
-        try {
-            const response = await fetch("products.json", {
-                headers: { "Accept": "application/json" }
-            });
-            if (!response.ok) {
-                throw new Error("Could not load products (HTTP " + response.status + ").");
-            }
-            const data = await response.json();
-            if (!data || !Array.isArray(data.products)) {
-                throw new Error("Product data is not in the expected format.");
-            }
-            products = data.products.filter(function (product) {
-                return product && typeof product.productId === "string" &&
-                    typeof product.description === "string" &&
-                    Number.isFinite(Number(product.price));
-            });
+        const response = await fetch(productsUrl, {
+            headers: { "Accept": "application/json" }
+        });
 
-            productSelect.replaceChildren();
-            const placeholder = document.createElement("option");
-            placeholder.value = "";
-            placeholder.textContent = "Select a product";
-            productSelect.appendChild(placeholder);
-            products.forEach(function (product) {
-                const option = document.createElement("option");
-                option.value = product.productId;
-                option.textContent = product.description;
-                productSelect.appendChild(option);
-            });
-            renderProducts("");
+        if (!response.ok) {
+            throw new Error(await requestError(response));
+        }
+
+        const data = await response.json();
+
+        if (!data || !Array.isArray(data.products)) {
+            throw new Error("Product data is not in the expected format.");
+        }
+
+        products = data.products.filter(function (product) {
+            return product &&
+                typeof product.productId === "string" &&
+                typeof product.description === "string" &&
+                Number.isFinite(Number(product.price));
+        });
+
+        productSelect.replaceChildren();
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select a product";
+
+        productSelect.appendChild(placeholder);
+
+        products.forEach(function (product) {
+            const option = document.createElement("option");
+
+            option.value = product.productId;
+            option.textContent = product.description;
+
+            productSelect.appendChild(option);
+        });
+
+        renderProducts("");
+    }
+
+    // Retrieve previously submitted return requests from MongoDB
+    async function loadReturns() {
+        const response = await fetch(apiUrl, {
+            headers: { "Accept": "application/json" }
+        });
+
+        if (!response.ok) {
+            throw new Error(await requestError(response));
+        }
+
+        const data = await response.json();
+
+        if (!data || !Array.isArray(data.returns)) {
+            throw new Error("Return data is not in the expected format.");
+        }
+
+        return data.returns;
+    }
+
+    // Initialize the page
+    async function initialize() {
+        showMessage("Loading products...", false);
+        submitButton.disabled = true;
+
+        try {
+            await loadProducts();
+
+            // Confirm that the returns API can also retrieve saved records
+            await loadReturns();
+
+            showMessage("", false);
         } catch (error) {
-            showMessage(error.message || "Could not load products.", true);
-            searchMessage.textContent = "Products could not be loaded.";
+            showMessage(error.message || "Could not load return page data.", true);
+            searchMessage.textContent = "Page data could not be loaded.";
+        } finally {
+            submitButton.disabled = false;
         }
     }
 
-    loadProducts();
+    initialize();
 });
